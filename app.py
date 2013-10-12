@@ -53,9 +53,9 @@ def validate_user(username, password):
     #sleep(1)
     kinit.stdin.write('%s\n' % password)
     e = kinit.wait()
-    return not e
     out,err = kinit.communicate()
     print(out,err)
+    return not e
 ################## Endpoints ###############
 
 @app.route('/', methods=['GET', 'POST'])
