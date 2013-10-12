@@ -71,9 +71,9 @@ def authenticate():
             return invalid_credentials()
         if 'clientToken' not in content:
             content['clientToken'] = str(uuid.uuid4())
+            c.execute("DELETE FROM users WHERE username=?", (content['username'],))
         if not validate_user(content['username'],content['password']):
             return invalid_credentials()
-        c.execute("DELETE FROM users WHERE username=?", (content['username'],))
         accessToken = str(uuid.uuid4())
         c.execute("INSERT INTO users (username, clientToken, accessToken) VALUES (?,?,?)", (content['username'],content['clientToken'],accessToken))
         conn.commit()
