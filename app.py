@@ -5,6 +5,13 @@ import uuid
 app = Flask(__name__)
 conn = sqlite3.connect('auth.db', check_same_thread = False)
 c = conn.cursor()
+######## DB SCHEMA #########
+""" CREATE TABLE users(
+ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+username TEXT NOT NULL,
+accessToken TEXT NOT NULL,
+clientToken TEXT NOT NULL 
+); """
 
 ################## Errors ##################
 def method_not_allowed():
@@ -59,9 +66,9 @@ def authenticate():
             content['clientToken'] = str(uuid.uuid4())
         if not validate_user(content['username'],content['password']):
             return invalid_credentials()
-        c.execute("DELETE FROM users WHERE username=?", content['username'])
+        c.execute("DELETE FROM users WHERE username=?", (content['username'],))
         accessToken = str(uuid.uuid4())
-        c.execute("INSERT INTO users (username, clientToken, accessToken) VALUES (?,?,?)", content['username'],content['clientToken'],accessToken)
+        c.execute("INSERT INTO users (username, clientToken, accessToken) VALUES (?,?,?)", (content['username'],content['clientToken'],accessToken))
         conn.commit()
         response = {"accessToken":accessToken,"clientToken":content['clientToken']}
         return json.dumps(response)
