@@ -79,9 +79,31 @@ def authenticate():
         conn.commit()
         response = {"accessToken":accessToken,"clientToken":content['clientToken']}
         return json.dumps(response)
+    except Exception as e:
+        return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
 
-
-
+@app.route('/refresh', methods=['GET', 'POST'])
+def refresh():
+    if request.method == 'GET':
+        return method_not_allowed()
+    if request.mimetype != 'application/json':
+        return unsupported_media_type()
+    try:
+        content = request.get_json()
+        if 'accessToken' not in content or 'clientToken' not in content:
+            return invalid_token()
+        c.execute("SELECT * FROM users WHERE clientToken=? AND accessToken=?", (content['clientToken'],content['accessToken']))
+        u = c.fetchone()
+        if not u:
+            return invalid_token()
+        client = u[3]
+        userid = u[0] 
+        access = str(uuid.uuid4())
+        print(access,userid)
+        c.execute("UPDATE users SET accessToken='%s' WHERE ID=?" % access, (userid,))
+        conn.commit()
+        response = {"accessToken":access,"clientToken":client}
+        return json.dumps(response)
     except Exception as e:
         return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
 
