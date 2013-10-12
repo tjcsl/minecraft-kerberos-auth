@@ -130,5 +130,5 @@ def errornotfound(e):
     args = {"error":"Not Found","errorMessage":"The server has not found anything matching the request URI"}
     return json.dumps(args), 404
 
-app.debug = True
+app.debug = False
 app.run(host="0.0.0.0", port=5000)
