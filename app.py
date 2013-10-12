@@ -43,7 +43,19 @@ def custom_exception(args):
     
 ################## Authentication Methods ##
 def validate_user(username, password):
-    return True
+    print(username,password)
+    from subprocess import Popen, PIPE
+    from time import sleep
+    kinit = '/usr/bin/kinit'
+    realm = "LOCAL.TJHSST.EDU"
+    kinit_args = [kinit, '%s@%s' % (username, realm)]
+    kinit = Popen(kinit_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    #sleep(1)
+    kinit.stdin.write('%s\n' % password)
+    e = kinit.wait()
+    return not e
+    out,err = kinit.communicate()
+    print(out,err)
 ################## Endpoints ###############
 
 @app.route('/', methods=['GET', 'POST'])
