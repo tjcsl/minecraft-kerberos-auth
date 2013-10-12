@@ -49,7 +49,7 @@ def validate_user(username, password):
     kinit = '/usr/bin/kinit'
     realm = "LOCAL.TJHSST.EDU"
     kinit_args = [kinit, '%s@%s' % (username, realm)]
-    kinit = Popen(kinit_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    kinit = Popen(kinit_args, stdin=PIPE)
     #sleep(1)
     kinit.stdin.write('%s\n' % password)
     e = kinit.wait()
