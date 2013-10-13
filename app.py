@@ -111,11 +111,12 @@ def refresh():
             return invalid_token()
         client = u[3]
         userid = u[0] 
+        username = u[1]
         access = str(uuid.uuid4())
         profileId = uuid.uuid4().hex
         c.execute("UPDATE users SET accessToken='%s' WHERE ID=?" % access, (userid,))
         conn.commit()
-        response = {"accessToken":access,"clientToken":client,"selectedProfile":{"id":profileId,"name":content['username']}}
+        response = {"accessToken":access,"clientToken":client,"selectedProfile":{"id":profileId,"name":username}}
         return json.dumps(response)
     except Exception as e:
         return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
