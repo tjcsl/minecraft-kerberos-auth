@@ -137,8 +137,9 @@ def validate():
     except Exception as e:
         return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
 
-@app.route('/game/checkserver.jsp')
-def checkserver():
+@app.route('/game/joinserver')
+@app.route('/game/joinserver.jsp')
+def joinserver():
     content = request.args
     if 'user' not in content or 'sessionId' not in content or 'serverId' not in content:
         return ""
@@ -157,8 +158,9 @@ def checkserver():
     conn.commit()
     return "OK"
 
-@app.route('/game/joinserver.jsp')
-def joinserver():
+@app.route('/game/checkserver')
+@app.route('/game/checkserver.jsp')
+def checkserver():
     content = request.args
     if 'user' not in content or 'serverId' not in content:
         return ""
@@ -175,5 +177,5 @@ def errornotfound(e):
     args = {"error":"Not Found","errorMessage":"The server has not found anything matching the request URI"}
     return json.dumps(args), 404
 
-app.debug = True
+app.debug = False
 app.run(host="0.0.0.0", port=5000)
