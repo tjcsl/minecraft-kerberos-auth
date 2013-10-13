@@ -56,7 +56,8 @@ def validate_user(username, password):
     p.expect(".*Password: ")
     p.sendline(password)
     e = p.expect([pexpect.EOF,"kinit: .*"])
-    pexpect.spawn('/usr/bin/kdestroy -c /tmp/legitcachename')
+    from subprocess import call
+    call('/usr/bin/kdestroy -c /tmp/legitcachename', shell=True)
     return not(e)
 ################## Endpoints ###############
 
