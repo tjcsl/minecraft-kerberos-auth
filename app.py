@@ -52,11 +52,11 @@ def validate_user(username, password):
     import pexpect
     import re
     username = re.findall(r"[a-z0-9]+",username)[0]
-    p = pexpect.spawn('/usr/bin/kinit %s@%s' % (username, "LOCAL.TJHSST.EDU"))
+    p = pexpect.spawn('/usr/bin/kinit -c /tmp/legitcachename %s@%s' % (username, "LOCAL.TJHSST.EDU"))
     p.expect(".*Password: ")
     p.sendline(password)
     e = p.expect([pexpect.EOF,"kinit: .*"])
-    pexpect.spawn('/usr/bin/kdestroy')
+    pexpect.spawn('/usr/bin/kdestroy -c /tmp/legitcachename')
     return not(e)
 ################## Endpoints ###############
 
