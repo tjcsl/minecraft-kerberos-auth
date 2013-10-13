@@ -11,7 +11,13 @@ ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 username TEXT NOT NULL,
 accessToken TEXT NOT NULL,
 clientToken TEXT NOT NULL 
-); """
+); 
+
+CREATE TABLE verify(
+ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+username TEXT NOT NULL,
+serverId TEXT NOT NULL
+);"""
 
 ################## Errors ##################
 def method_not_allowed():
@@ -133,8 +139,36 @@ def validate():
 
 @app.route('/game/checkserver.jsp')
 def checkserver():
-    print(request.args)
-    return request.args
+    content = request.args
+    if 'user' not in content or 'sessionId' not in content or 'serverId' not in content:
+        return ""
+    sessionId = content['sessionId'].split(":")
+    if len(sessionId) != 3:
+        return ""
+    accessToken = sessionId[1]
+    c.execute("SELECT * FROM users WHERE accessToken=?", (accessToken,))
+    u = c.fetchone()
+    if not u:
+        return ""
+    if u[1] != content['user']:
+        return ""
+    c.execute("DELETE FROM verify WHERE serverId=? AND username=?", (content['serverId'], content['user']))
+    c.execute("INSERT INTO verify (username, serverId) VALUES (?,?)", (content['user'], content['serverId']))
+    conn.commit()
+    return "OK"
+
+@app.route('/game/joinserver.jsp')
+def joinserver():
+    content = request.args
+    if 'user' not in content or 'serverId' not in content:
+        return ""
+    c.execute("SELECT * FROM verify WHERE serverId=? AND username=?", (content['serverId'], content['user']))
+    u = c.fetchone()
+    if not u:
+        return ""
+    c.execute("DELETE FROM verify WHERE serverId=? AND username=?", (content['serverId'], content['user']))
+    conn.commit()
+    return "YES"
 
 @app.errorhandler(404)
 def errornotfound(e):
