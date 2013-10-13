@@ -189,6 +189,36 @@ def skin(username):
 def cloak(username):
     return send_file('cloaks/' + username + '.png')
 
+@app.route('/skins', methods=['GET', 'POST'])
+@app.route('/skin', methods=['GET', 'POST'])
+def upload_skin():
+	if request.method == 'POST':
+		file = request.files['skin']
+		username = request.form['username']
+		password = request.form['password']
+		if file and password and username and validate_user(username, password):
+			import re
+			filename = "/home/mcauth/auth/skins/" + re.findall(r"[a-z0-9]+",username)[0] + ".png"
+			file.save(filename)
+			return """<!doctype html>
+<html>
+<body>
+<h1>File uploaded successfully</h1>
+</body>
+</html>"""
+	return """<!doctype html>
+<html>
+<body>
+<title>Upload Skin</title>
+<h1>Upload Player Skin</h1>
+<form action="" method=post enctype=multipart/form-data>
+  <p>Username: <input type=text name=username /><br/>
+  Password: <input type=password name=password /><br/>
+  Skin: <input type=file name=skin /><br/>
+  <input type=submit value=Upload>
+</form>
+</body>
+</html>"""
 
 app.debug = False
 app.run(host="0.0.0.0", port=5000)
