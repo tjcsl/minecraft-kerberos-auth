@@ -63,10 +63,12 @@ def index():
 def authenticate():
     if request.method == 'GET':
         return method_not_allowed()
-    if request.mimetype != 'application/json':
+    if not(request.mimetype == 'application/json' or request.mimetype == 'application/x-www-form-urlencoded'):
         return unsupported_media_type()
     try:
         content = request.get_json()
+        if not content:
+            content = request.form
         if 'username' not in content or 'password' not in content:
             return invalid_credentials()
         if 'clientToken' not in content:
@@ -86,10 +88,12 @@ def authenticate():
 def refresh():
     if request.method == 'GET':
         return method_not_allowed()
-    if request.mimetype != 'application/json':
+    if not(request.mimetype == 'application/json' or request.mimetype == 'application/x-www-form-urlencoded'):
         return unsupported_media_type()
     try:
         content = request.get_json()
+        if not content:
+            content = request.form
         if 'accessToken' not in content or 'clientToken' not in content:
             return invalid_token()
         c.execute("SELECT * FROM users WHERE clientToken=? AND accessToken=?", (content['clientToken'],content['accessToken']))
@@ -110,10 +114,12 @@ def refresh():
 def validate():
     if request.method == 'GET':
         return method_not_allowed()
-    if request.mimetype != 'application/json':
+    if not(request.mimetype == 'application/json' or request.mimetype == 'application/x-www-form-urlencoded'):
         return unsupported_media_type()
     try:
         content = request.get_json()
+        if not content:
+            content = request.form
         if 'accessToken' not in content:
             return invalid_token()
         c.execute("SELECT * FROM users WHERE accessToken=?", (content['accessToken'],))
@@ -124,11 +130,15 @@ def validate():
     except Exception as e:
         return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
 
+@app.route('/game/checkserver.jsp')
+def checkserver():
+    print(request.args)
+    return request.args
 
 @app.errorhandler(404)
 def errornotfound(e):
     args = {"error":"Not Found","errorMessage":"The server has not found anything matching the request URI"}
     return json.dumps(args), 404
 
-app.debug = False
+app.debug = True
 app.run(host="0.0.0.0", port=5000)
