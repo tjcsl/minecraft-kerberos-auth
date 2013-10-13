@@ -77,9 +77,10 @@ def authenticate():
         if not validate_user(content['username'],content['password']):
             return invalid_credentials()
         accessToken = str(uuid.uuid4())
+        profileId = uuid.uuid4().hex
         c.execute("INSERT INTO users (username, clientToken, accessToken) VALUES (?,?,?)", (content['username'],content['clientToken'],accessToken))
         conn.commit()
-        response = {"accessToken":accessToken,"clientToken":content['clientToken']}
+        response = {"accessToken":accessToken,"clientToken":content['clientToken'],"availableProfiles":[{"id":profileId,"name":content['username']}],"selectedProfile":{"id":profileId,"name":content['username']}}
         return json.dumps(response)
     except Exception as e:
         return custom_exception({"error":str(type(e).__name__), "errorMessage":str(e)})
