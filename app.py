@@ -180,5 +180,14 @@ def errornotfound(e):
     args = {"error":"Not Found","errorMessage":"The server has not found anything matching the request URI"}
     return json.dumps(args), 404
 
+@app.route('/skin/<username>.png')
+def skin(username):
+    return send_file('skins/' + username + '.png')
+
+@app.route('/cloak/<username>.png')
+def cloak(username):
+    return send_file('cloaks/' + username + '.png')
+
+
 app.debug = False
 app.run(host="0.0.0.0", port=5000)
